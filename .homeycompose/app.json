@@ -1,0 +1,24 @@
+{
+  "id": "io.borhaug.tesla",
+  "version": "0.0.1",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "name": {
+    "en": "Tesla Connect"
+  },
+  "description": {
+    "en": "Adds support for interacting with your Tesla. You will need to keep this app up to date, since some of the credentials are changing from time to time, and I will need to update the."
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Brede Børhaug",
+    "email": "brede@borhaug.io"
+  }
+}

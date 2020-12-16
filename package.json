@@ -1,0 +1,13 @@
+{
+  "name": "io.borhaug.tesla",
+  "version": "0.0.1",
+  "main": "app.js",
+  "devDependencies": {
+    "homey": "^2.9.3"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "lodash": "^4.17.20",
+    "node-tesla-api": "^0.1.0"
+  }
+}
