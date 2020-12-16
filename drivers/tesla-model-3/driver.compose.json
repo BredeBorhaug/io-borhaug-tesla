@@ -1,0 +1,25 @@
+{
+  "id": "tesla-model-3",
+  "name": {
+    "en": "Tesla Model 3"
+  },
+  "class": "other",
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices", 
+      "navigation": {
+        "next": "add_my_devices" 
+      }
+    },
+    {
+      "id": "add_my_devices",
+      "template": "add_devices" 
+    }
+  ],
+  "capabilities": [],
+  "images": {
+    "large": "/drivers/tesla-model-3/assets/images/large_3.png",
+    "small": "/drivers/tesla-model-3/assets/images/small_3.png"
+  }
+}

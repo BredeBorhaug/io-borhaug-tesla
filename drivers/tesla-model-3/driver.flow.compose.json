@@ -1,0 +1,22 @@
+{
+  "actions": [
+    {
+      "id": "start-auto-conditioning",
+      "title": {
+        "en": "Start Auto Conditioning"
+      },
+      "hint": {
+        "en": "Start the air conditioning in the car"
+      }
+    },
+    {
+      "id": "stop-auto-conditioning",
+      "title": {
+        "en": "Stop Auto Conditioning"
+      },
+      "hint": {
+        "en": "Stop the air conditioning of the car"
+      }
+    }
+  ]
+}

@@ -4,6 +4,8 @@ const Homey = require('homey');
 const Tesla = require('node-tesla-api')
 const _ = require('lodash')
 
+
+
 // These values are an open secret.
 // See https://tesla-api.timdorr.com for the latest values.
 const clientId = '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384'
@@ -28,9 +30,16 @@ class MyApp extends Homey.App {
       clientSecret
     })
     this._auth = token
-    console.log(this._auth)
+
+    
+
 
   }
+
+  getToken(){
+    return this._auth
+  }
+
 }
 
 module.exports = MyApp;
