@@ -1,18 +1,18 @@
 {
   "actions": [
     {
-      "id": "start-auto-conditioning",
+      "id": "auto-conditioning-start",
       "title": {
-        "en": "Start Auto Conditioning"
+        "en": "Auto Conditioning Start"
       },
       "hint": {
         "en": "Start the air conditioning in the car"
       }
     },
     {
-      "id": "stop-auto-conditioning",
+      "id": "auto-conditioning-stop",
       "title": {
-        "en": "Stop Auto Conditioning"
+        "en": "Auto Conditioning Stop"
       },
       "hint": {
         "en": "Stop the air conditioning of the car"

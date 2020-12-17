@@ -4,6 +4,13 @@ const Homey = require('homey')
 const Tesla = require('node-tesla-api')
 
 
+
+
+const flowlist = {
+  autoConditioningStart: 'auto-conditioning-start',
+  autoConditioningStop: 'auto-conditioning-stop'
+}
+
 class MyDevice extends Homey.Device {
   /**
    * onInit is called when the device is initialized.
@@ -11,35 +18,14 @@ class MyDevice extends Homey.Device {
   async onInit() {
 
 
+    await this.autoConditioningStart('auto-conditioning-start') //flowlist.startAutoConditioning)
+
+    await this.autoConditioningStop('auto-conditioning-stop') //flowlist.stopAutoConditioning)
 
 
 
 
-    let startAutoConditioning = this.homey.flow.getActionCard('start-auto-conditioning');
-    startAutoConditioning.registerRunListener(async (args, state) => {
-          
-      this.log('Should wake the car here')
-        // implement wake car algorithm
-      
-      const {response: { result, reason }} = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id , token: this.homey.app.getToken().accessToken })
-      this.log('The result: ' + result)
-      this.log('The reason: ' + reason)
 
-      this.log('Started the auto conditioning')
-    });
-
-    let stopAutoConditioning = this.homey.flow.getActionCard('stop-auto-conditioning');
-    stopAutoConditioning.registerRunListener(async (args, state) => {
-          
-      this.log('Should wake the car here')
-        // implement wake car algorithm
-      
-      const {response: { result, reason }} = await Tesla.vehicles.autoConditioningStop({ id: this.getData().id , token: this.homey.app.getToken().accessToken })
-      this.log('The result: ' + result)
-      this.log('The reason: ' + reason)
-
-      this.log('Stoped the auto conditioning')
-    });
 
 
     this.log('Tesla Model 3 device has been initialized');
@@ -50,6 +36,39 @@ class MyDevice extends Homey.Device {
    */
   async onAdded() {
     this.log('MyDevice has been added');
+  }
+
+  // Register the auto conditioning start condittion
+  async autoConditioningStart(flowId) {
+    let startAutoConditioning = this.homey.flow.getActionCard(flowId);
+    startAutoConditioning.registerRunListener(async (args, state) => {
+
+      this.log('Should wake the car here')
+      // implement wake car algorithm
+
+      const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+      //this.log('The result: ' + result)
+      //this.log('The reason: ' + reason)
+
+      this.log('Started the auto conditioning')
+    });
+  }
+
+
+  // Register the auto conditioning stop condittion
+  async autoConditioningStop(flowId) {
+    let stopAutoConditioning = this.homey.flow.getActionCard(flowId);
+    stopAutoConditioning.registerRunListener(async (args, state) => {
+
+      this.log('Should wake the car here')
+      // implement wake car algorithm
+
+      const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStop({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+      //this.log('The result: ' + result)
+      //this.log('The reason: ' + reason)
+
+      this.log('Stoped the auto conditioning')
+    });
   }
 
   /**
@@ -80,7 +99,7 @@ class MyDevice extends Homey.Device {
     this.log('MyDevice has been deleted');
   }
 
-  
+
 }
 
 module.exports = MyDevice;

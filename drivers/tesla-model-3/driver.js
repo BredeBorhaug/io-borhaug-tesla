@@ -29,7 +29,6 @@ class MyDriver extends Homey.Driver {
 
     cars.forEach(item => {
       if (item.vin[3].toLowerCase() == 3) {
-        console.log('found a car:', item.displayName)
         devices.push({
           data: {
             id: item.id,
@@ -45,7 +44,7 @@ class MyDriver extends Homey.Driver {
         })
       }
     })
-    console.log(devices)
+    
 
     return devices
   }

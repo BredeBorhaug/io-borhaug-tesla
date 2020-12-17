@@ -19,25 +19,59 @@ class MyApp extends Homey.App {
   async onInit() {
     this.log('MyApp start to initialized');
     // We may not need this
+    this._connected = false
 
-    this._username = this.homey.settings.get('username')
-    this._password = this.homey.settings.get('password')
-
-    const token = await Tesla.oauth.token({
-      email: this._username,
-      password: this._password,
-      clientId,
-      clientSecret
-    })
-    this._auth = token
-
+    //this._username = this.homey.settings.get('username')
+    //this._password = this.homey.settings.get('password')
+    
+    // Authenticate the user 
+    this.authenticate()
+    
     
 
+    // Setup the settings callback
+    this.setupSettings()
 
+    
+    
+  }
+  
+  async authenticate() {
+    this._connected = false
+    this._auth = null
+    try {
+      const token = await Tesla.oauth.token({
+        email: this.homey.settings.get('username'),
+        password: this.homey.settings.get('password'),
+        clientId,
+        clientSecret
+      })
+      this._connected = true
+      this._auth = token
+      this.log('Authorization completed successfully')
+    } catch (error) {
+      this.log('The auth login process did not succeed. Change the settings')
+    }
+  }
+
+  isConnected(){
+    return this.isConnected
   }
 
   getToken(){
-    return this._auth
+    if (this._connected == false){
+      return false
+    }else{
+      return this._auth
+    }
+  }
+
+  async setupSettings(){
+    await this.homey.settings.on('set', async (args) => {
+      //this.log('Settings updated. Call Authorize to get new token and connect to Tesla again.')
+      await this.authenticate()
+      //this.log('Status of connection is now: ' + this._connected)
+    })
   }
 
 }
