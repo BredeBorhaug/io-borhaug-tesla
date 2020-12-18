@@ -6,6 +6,7 @@ Features:
 - Start Air Condition
 - Stop Air Condition
 
-
+Cars supported:
+- Tesla Model 3
 
 For now the App does not keep the car connection all the time, so battery will not drain as fast as some other solutions. Consequence is that geo-fence and similar functionality can not be implemented for now. 

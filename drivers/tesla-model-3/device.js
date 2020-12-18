@@ -24,10 +24,6 @@ class MyDevice extends Homey.Device {
 
 
 
-
-
-
-
     this.log('Tesla Model 3 device has been initialized');
   }
 
@@ -40,17 +36,21 @@ class MyDevice extends Homey.Device {
 
   // Register the auto conditioning start condittion
   async autoConditioningStart(flowId) {
+    
     let startAutoConditioning = this.homey.flow.getActionCard(flowId);
     startAutoConditioning.registerRunListener(async (args, state) => {
-
-      this.log('Should wake the car here')
-      // implement wake car algorithm
-
-      const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
-      //this.log('The result: ' + result)
-      //this.log('The reason: ' + reason)
-
-      this.log('Started the auto conditioning')
+      
+      this.log('Check if the car is asleep. If it is, call the wakeCar function')
+      if( await this.homey.app.isOnline({id: this.getData().id, token: this.homey.app.getToken().accessToken}) === 'asleep'){
+        this.log('Car is asleep')
+        await this.homey.app.wakeCar({id: this.getData().id, token: this.homey.app.getToken().accessToken})
+      }
+      try {
+        const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+        this.log('Started the auto conditioning')
+      } catch (error) {
+        this.log(error)
+      }
     });
   }
 
@@ -60,14 +60,20 @@ class MyDevice extends Homey.Device {
     let stopAutoConditioning = this.homey.flow.getActionCard(flowId);
     stopAutoConditioning.registerRunListener(async (args, state) => {
 
-      this.log('Should wake the car here')
-      // implement wake car algorithm
-
-      const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStop({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+      this.log('Check if the car is asleep. If it is, call the wakeCar function')
+      if( await this.homey.app.isOnline({id: this.getData().id, token: this.homey.app.getToken().accessToken}) === 'asleep'){
+        this.log('Car is asleep')
+        await this.homey.app.wakeCar({id: this.getData().id, token: this.homey.app.getToken().accessToken})
+      }
+      try {
+        const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStop({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+        this.log('Stoped the auto conditioning')
+      } catch (error) {
+        this.log(error)
+      }
       //this.log('The result: ' + result)
       //this.log('The reason: ' + reason)
 
-      this.log('Stoped the auto conditioning')
     });
   }
 
