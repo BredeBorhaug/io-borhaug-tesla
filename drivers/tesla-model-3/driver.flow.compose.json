@@ -17,6 +17,15 @@
       "hint": {
         "en": "Stop the air conditioning of the car"
       }
+    },
+    {
+      "id": "wake-car",
+      "title": {
+        "en": "Wake Car"
+      },
+      "hint": {
+        "en": "Wake up Car"
+      }
     }
   ],
   "conditions": [

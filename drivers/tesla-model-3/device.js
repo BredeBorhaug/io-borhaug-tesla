@@ -23,12 +23,12 @@ class MyDevice extends Homey.Device {
     // Action flow cards
     await this.autoConditioningStart('auto-conditioning-start') //flowlist.startAutoConditioning)
     await this.autoConditioningStop('auto-conditioning-stop') //flowlist.stopAutoConditioning)
-
+    await this.wakeCarAction('wake-car')
 
 
     // Condition flow cards
-    await this.stateOfCharge('state-of-charge') 
-    
+    await this.stateOfCharge('state-of-charge')
+
 
 
     this.log('Tesla Model 3 device has been initialized');
@@ -54,9 +54,9 @@ class MyDevice extends Homey.Device {
       }
       try {
         const { response: { batteryLevel, chargeEnableRequest } } = await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
-        
+
         // TODO - Make into variable from flowcard, and a min value to override user input. For now set to 20%. 
-        if (batteryLevel >= 20) { 
+        if (batteryLevel >= 20) {
           const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
           this.log('Started the auto conditioning')
         }
@@ -89,6 +89,22 @@ class MyDevice extends Homey.Device {
     });
   }
 
+  async wakeCarAction(flowId) {
+    let wakeCar = this.homey.flow.getActionCard(flowId)
+
+    wakeCar.registerRunListener(async () => {
+      if (await this.homey.app.isOnline({ id: this.getData().id, token: this.homey.app.getToken().accessToken }) === 'asleep') {
+        this.log('Car is asleep')
+        try {
+          await this.homey.app.wakeCar({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+          this.log('Woke up car')
+        } catch (error) {
+          this.log(error)
+        }
+      }
+    })
+  }
+
   async stateOfCharge(flowId) {
     let stateOfCharge = this.homey.flow.getConditionCard(flowId)
 
@@ -115,6 +131,8 @@ class MyDevice extends Homey.Device {
 
     })
   }
+
+
 
   /**
    * onSettings is called when the user updates the device's settings.
