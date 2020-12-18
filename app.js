@@ -27,7 +27,7 @@ class MyApp extends Homey.App {
     //this._password = this.homey.settings.get('password')
 
     // Authenticate the user 
-    this.authenticate()
+    await this.authenticate()
 
 
     // Refresh token every 7 days
@@ -36,7 +36,7 @@ class MyApp extends Homey.App {
     // Setup the settings callback
     this.setupSettings()
 
-    
+
 
 
   }
@@ -69,6 +69,29 @@ class MyApp extends Homey.App {
       })
       this._auth = token
     }, refreshInterval) // call at interval according to refreshInterval variable
+  }
+
+  async wakeCar ({ id, token, retry = 0, maxRetries = 3 }) {
+    if(this._connected==false) return
+    if (retry === maxRetries) return
+    console.log('In wakeCar algorithm')
+    const {
+      response: { state } 
+    } = await Tesla.vehicles.vehicle({ id, token })
+    if (state === 'online') return
+    await Tesla.vehicles.wake({ id, token })
+    await setTimeout(() => {}, 2500)
+    // try again
+    await wakeCar({ id, token, retry: retry + 1, maxRetries })
+  }
+
+  async isOnline({id, token}){  
+    const {
+      response: { state } 
+    } = await Tesla.vehicles.vehicle({ id, token })
+    this.log('State in isOnline() function : ' + state)
+    if (state === 'online') return state
+    if (state === 'asleep') return state
   }
 
   isConnected() {
