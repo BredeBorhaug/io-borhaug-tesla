@@ -80,9 +80,9 @@ class MyApp extends Homey.App {
     } = await Tesla.vehicles.vehicle({ id, token })
     if (state === 'online') return
     await Tesla.vehicles.wake({ id, token })
-    await setTimeout(() => {}, 2500)
+    await setTimeout(() => {}, 5000)
     // try again
-    await wakeCar({ id, token, retry: retry + 1, maxRetries })
+    await this.wakeCar({ id, token, retry: retry + 1, maxRetries })
   }
 
   async isOnline({id, token}){  

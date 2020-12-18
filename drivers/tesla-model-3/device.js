@@ -8,7 +8,9 @@ const Tesla = require('node-tesla-api')
 
 const flowlist = {
   autoConditioningStart: 'auto-conditioning-start',
-  autoConditioningStop: 'auto-conditioning-stop'
+  autoConditioningStop: 'auto-conditioning-stop',
+  setConditioningTemp: 'set-conditioning-temp',
+  stateOfCharge: 'state-og-charge',
 }
 
 class MyDevice extends Homey.Device {
@@ -18,10 +20,15 @@ class MyDevice extends Homey.Device {
   async onInit() {
 
 
+    // Action flow cards
     await this.autoConditioningStart('auto-conditioning-start') //flowlist.startAutoConditioning)
-
     await this.autoConditioningStop('auto-conditioning-stop') //flowlist.stopAutoConditioning)
 
+
+
+    // Condition flow cards
+    await this.stateOfCharge('state-of-charge') 
+    
 
 
     this.log('Tesla Model 3 device has been initialized');
@@ -36,18 +43,23 @@ class MyDevice extends Homey.Device {
 
   // Register the auto conditioning start condittion
   async autoConditioningStart(flowId) {
-    
+
     let startAutoConditioning = this.homey.flow.getActionCard(flowId);
     startAutoConditioning.registerRunListener(async (args, state) => {
-      
+
       this.log('Check if the car is asleep. If it is, call the wakeCar function')
-      if( await this.homey.app.isOnline({id: this.getData().id, token: this.homey.app.getToken().accessToken}) === 'asleep'){
+      if (await this.homey.app.isOnline({ id: this.getData().id, token: this.homey.app.getToken().accessToken }) === 'asleep') {
         this.log('Car is asleep')
-        await this.homey.app.wakeCar({id: this.getData().id, token: this.homey.app.getToken().accessToken})
+        await this.homey.app.wakeCar({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
       }
       try {
-        const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
-        this.log('Started the auto conditioning')
+        const { response: { batteryLevel, chargeEnableRequest } } = await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+        
+        // TODO - Make into variable from flowcard, and a min value to override user input. For now set to 20%. 
+        if (batteryLevel >= 20) { 
+          const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStart({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+          this.log('Started the auto conditioning')
+        }
       } catch (error) {
         this.log(error)
       }
@@ -61,9 +73,9 @@ class MyDevice extends Homey.Device {
     stopAutoConditioning.registerRunListener(async (args, state) => {
 
       this.log('Check if the car is asleep. If it is, call the wakeCar function')
-      if( await this.homey.app.isOnline({id: this.getData().id, token: this.homey.app.getToken().accessToken}) === 'asleep'){
+      if (await this.homey.app.isOnline({ id: this.getData().id, token: this.homey.app.getToken().accessToken }) === 'asleep') {
         this.log('Car is asleep')
-        await this.homey.app.wakeCar({id: this.getData().id, token: this.homey.app.getToken().accessToken})
+        await this.homey.app.wakeCar({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
       }
       try {
         const { response: { result, reason } } = await Tesla.vehicles.autoConditioningStop({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
@@ -75,6 +87,33 @@ class MyDevice extends Homey.Device {
       //this.log('The reason: ' + reason)
 
     });
+  }
+
+  async stateOfCharge(flowId) {
+    let stateOfCharge = this.homey.flow.getConditionCard(flowId)
+
+    stateOfCharge.registerRunListener(async ({ soc, state }) => {
+
+      this.log('Check if the car is asleep. If it is, call the wakeCar function')
+      if (await this.homey.app.isOnline({ id: this.getData().id, token: this.homey.app.getToken().accessToken }) === 'asleep') {
+        this.log('Car is asleep')
+        await this.homey.app.wakeCar({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+      }
+
+      try {
+        // check the soc
+        const { response: { batteryLevel, chargeEnableRequest } } = await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+        this.log('The batteryLevel checked and at : ' + batteryLevel)
+        if (batteryLevel >= soc && typeof batteryLevel == 'number') {
+          return true
+        } else {
+          return false
+        }
+      } catch (error) {
+        this.log(error)
+      }
+
+    })
   }
 
   /**

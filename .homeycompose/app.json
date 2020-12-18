@@ -1,6 +1,6 @@
 {
   "id": "io.borhaug.tesla",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "name": {

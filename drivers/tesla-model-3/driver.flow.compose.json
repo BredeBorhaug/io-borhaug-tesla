@@ -18,5 +18,25 @@
         "en": "Stop the air conditioning of the car"
       }
     }
+  ],
+  "conditions": [
+    {
+      "id": "state-of-charge",
+      "title": {
+        "en": "State of Charge"
+      },
+      "hint": {
+        "en": "Check state of charge ( % ) is larger than value provided"
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "soc",
+          "placeholder": {
+            "en": "50"
+          }
+        }
+      ]
+    }
   ]
 }
