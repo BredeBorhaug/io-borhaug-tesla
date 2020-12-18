@@ -46,6 +46,15 @@
           }
         }
       ]
+    },
+    {
+      "id": "car-is-charging",
+      "title": {
+        "en": "Car is charging"
+      },
+      "hint": {
+        "en": "Check if the car is charging"
+      }
     }
   ]
 }

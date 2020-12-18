@@ -11,6 +11,7 @@ const flowlist = {
   autoConditioningStop: 'auto-conditioning-stop',
   setConditioningTemp: 'set-conditioning-temp',
   stateOfCharge: 'state-og-charge',
+  carIsCharging: 'car-is-charging'
 }
 
 class MyDevice extends Homey.Device {
@@ -28,8 +29,9 @@ class MyDevice extends Homey.Device {
 
     // Condition flow cards
     await this.stateOfCharge('state-of-charge')
+    await this.carIsCharging('car-is-charging')
 
-
+    //console.log(await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken }))
 
     this.log('Tesla Model 3 device has been initialized');
   }
@@ -121,6 +123,34 @@ class MyDevice extends Homey.Device {
         const { response: { batteryLevel, chargeEnableRequest } } = await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
         this.log('The batteryLevel checked and at : ' + batteryLevel)
         if (batteryLevel >= soc && typeof batteryLevel == 'number') {
+          return true
+        } else {
+          return false
+        }
+      } catch (error) {
+        this.log(error)
+      }
+
+    })
+  }
+
+
+  async carIsCharging(flowId) {
+    let carIsChargingCard = this.homey.flow.getConditionCard(flowId)
+
+    carIsChargingCard.registerRunListener(async () => {
+
+      this.log('Check if the car is asleep. If it is, call the wakeCar function')
+      if (await this.homey.app.isOnline({ id: this.getData().id, token: this.homey.app.getToken().accessToken }) === 'asleep') {
+        this.log('Car is asleep')
+        await this.homey.app.wakeCar({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+      }
+
+      try {
+        // check the soc
+        const { response: { chargingState} } = await Tesla.vehicles.chargeState({ id: this.getData().id, token: this.homey.app.getToken().accessToken })
+        this.log('The charging state checked and is : ' + chargingState)
+        if (chargingState === 'Charging') {
           return true
         } else {
           return false
